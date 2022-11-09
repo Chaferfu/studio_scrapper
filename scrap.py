@@ -10,21 +10,23 @@ DATE_FORMAT = "%A %d %B"
 # Instantiate the parser
 parser = argparse.ArgumentParser(description='Affiche les prochaines dispos de studio')
 parser.add_argument('--semaine', default=False, action='store_true', help="Si la recherche doit retourner des résultats les soirs de semaine (à partir de 18h)")
-parser.add_argument('--mini', type=int, default=0, help="La durée minimale de la session (en heures)")
+parser.add_argument('--duree_mini', type=int, default=0, help="La durée minimale de la session (en heures)")
 parser.add_argument('--jours_recherche', type=int, default=1, help="Sur combien de jours dans le futur la recherche doit s'executer")
+parser.add_argument('--heure_mini', type=int, default=0, help="A quelle heure la session commence au plus tôt")
 
 args = parser.parse_args()
 SEMAINE = args.semaine
-MINI = args.mini
+DUREE_MINI = args.duree_mini
+HEURE_MINI = args.heure_mini
 JOURS_RECHERCHE = args.jours_recherche
 
 sessions = []
 
 if SEMAINE:
-    print("Recherche de sessions en semaine (à partir de 18h)")
+    print("Recherche de sessions en semaine")
 
-if MINI:
-    print(f"Recherche session de {MINI} heures minimum")
+if DUREE_MINI:
+    print(f"Recherche session de {DUREE_MINI} heures minimum")
 
 for single_date in (datetime.datetime.now() + datetime.timedelta(n) for n in range(JOURS_RECHERCHE)):
 
@@ -42,14 +44,11 @@ for single_date in (datetime.datetime.now() + datetime.timedelta(n) for n in ran
             end = int(slot.get('data-end'))
             date_session_debut = datetime.datetime.fromtimestamp(start)
             date_session_fin = datetime.datetime.fromtimestamp(end)
+
             if SEMAINE:
 
                 # Si c'est un weekend on passe
                 if date_session_debut.weekday() in [5, 6]:
-                    continue
-
-                # Si la session termine avant 19 heure on passe 
-                if date_session_fin.hour < 19:
                     continue
 
                 # Si la session commence avant 18h on la fait commencer à 18h
@@ -59,7 +58,7 @@ for single_date in (datetime.datetime.now() + datetime.timedelta(n) for n in ran
             duration = date_session_fin - date_session_debut
 
             # Si la session dure au moins le minimum on l'ajoute a la liste
-            if duration >= datetime.timedelta(hours=MINI):
+            if date_session_debut.hour >= HEURE_MINI and duration >= datetime.timedelta(hours=DUREE_MINI):
 
                 session = {
                     "room": room.h4.contents[0].strip(),
