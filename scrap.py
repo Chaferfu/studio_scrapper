@@ -60,19 +60,22 @@ for single_date in (datetime.datetime.now() + datetime.timedelta(n) for n in ran
             # Si la session dure au moins le minimum on l'ajoute a la liste
             if date_session_debut.hour >= HEURE_MINI and duration >= datetime.timedelta(hours=DUREE_MINI):
 
-                session = {
-                    "room": room.h4.contents[0].strip(),
-                    "start": date_session_debut,
-                    "end": date_session_fin,
-                    "duration": duration,
-                    "size": "".join([r for r in room.find("div", "description").get_text().split() if "m2" in r])
-                }
-                sessions.append(session)
+                room_name = room.h4.contents[0].strip()
+
+                if not any(bad_room in room_name.lower() for bad_room in ["djing", "drums", "cabine piano", "mao"]):
+                    session = {
+                        "room": room_name,
+                        "start": date_session_debut,
+                        "end": date_session_fin,
+                        "duration": duration,
+                        "size": "".join([r for r in room.find("div", "description").get_text().split() if "m2" in r])
+                    }
+                    sessions.append(session)
 
 # Trie les sessions chronologiquement
 sessions.sort(key=lambda x: x["start"])
 
 for session in sessions:
     print(f"{session['start'].strftime(DATE_FORMAT)}, {session['start'].strftime(TIME_FORMAT)} - {session['end'].strftime(TIME_FORMAT)} -> Session de {str(session['duration'])} dans {session['room']} ({session['size']})")
-if not session:
+if not sessions:
     print("Aucune session :(")
