@@ -66,6 +66,6 @@ def studio_scrap(request):
     sessions.sort(key=lambda x: x["start"])
 
     if sessions:
-        return "\n".join([f"{session['start'].strftime(DATE_FORMAT)}, {session['start'].strftime(TIME_FORMAT)} - {session['end'].strftime(TIME_FORMAT)} -> Session de {str(session['duration'])} dans {session['room']} ({session['size']})" for session in sessions])
+        return "<br>".join([f"{session['start'].strftime(DATE_FORMAT)}, {session['start'].strftime(TIME_FORMAT)} - {session['end'].strftime(TIME_FORMAT)} -> Session de {str(session['duration'])} dans {session['room']} ({session['size']})" for session in sessions])
     else:
         return "Aucune session :("
