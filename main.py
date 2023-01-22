@@ -8,10 +8,10 @@ def studio_scrap(request):
     TIME_FORMAT = "%Hh%M"
     DATE_FORMAT = "%A %d %B"
 
-    SEMAINE = request.args.get("semaine", None)
-    DUREE_MINI = request.args.get("duree_mini", None)
-    HEURE_MINI = request.args.get("heure_mini", None)
-    JOURS_RECHERCHE = request.args.get("jours_recherche", None)
+    SEMAINE = bool(request.args.get("semaine", False))
+    DUREE_MINI = int(request.args.get("duree_mini", 0))
+    HEURE_MINI = int(request.args.get("heure_mini", 0))
+    JOURS_RECHERCHE = int(request.args.get("jours_recherche", 1))
 
     sessions = []
 
