@@ -1,12 +1,14 @@
 from bs4 import BeautifulSoup
 import datetime
 import requests
+import pytz
 
 def studio_scrap(request):
 
     URL = "https://www.quickstudio.com/fr/studios/hf-music-studio-14/bookings"
     TIME_FORMAT = "%Hh%M"
     DATE_FORMAT = "%A %d %B"
+    LOCALE = pytz.timezone("Europe/Paris")
 
     SEMAINE = bool(request.args.get("semaine", False))
     DUREE_MINI = int(request.args.get("duree_mini", 0))
@@ -66,6 +68,8 @@ def studio_scrap(request):
     sessions.sort(key=lambda x: x["start"])
 
     if sessions:
-        return "<br>".join([f"{session['start'].strftime(DATE_FORMAT)}, {session['start'].strftime(TIME_FORMAT)} - {session['end'].strftime(TIME_FORMAT)} -> Session de {str(session['duration'])} dans {session['room']} ({session['size']})" for session in sessions])
+        return "<br>".join([f"{session['start'].astimezone(LOCALE).strftime(DATE_FORMAT)}, "
+                            f"{session['start'].astimezone(LOCALE).strftime(TIME_FORMAT)} - {session['end'].astimezone(LOCALE).strftime(TIME_FORMAT)} "
+                            f"-> Session de {str(session['duration'])} dans {session['room']} ({session['size']})" for session in sessions])
     else:
         return "Aucune session :("
